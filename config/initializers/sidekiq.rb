@@ -3,7 +3,7 @@ require "sidekiq/web"
 require "sidekiq/cron/web"
 
 Sidekiq::Web.use(Rack::Auth::Basic) do |user, password|
-  [user, password] == [ENV["ADMIN_USERNAME"], ENV["ADMIN_PASSWORD"]]
+  [user, password] == [Rails.application.credentials[:admin_username], Rails.application.credentials[:admin_password]]
 end
 
 Sidekiq.configure_server do |config|
