@@ -15,6 +15,8 @@ gem "redis", "~> 4.0"
 gem "sidekiq"
 gem "sidekiq-cron"
 gem "httparty"
+gem "tiny_tds"
+gem "activerecord-sqlserver-adapter"
 
 gem "tzinfo-data", platforms: %i[ mingw mswin x64_mingw jruby ]
 
