@@ -14,6 +14,7 @@ gem "jbuilder"
 gem "redis", "~> 4.0"
 gem "sidekiq"
 gem "sidekiq-cron"
+gem "httparty"
 
 gem "tzinfo-data", platforms: %i[ mingw mswin x64_mingw jruby ]
 
