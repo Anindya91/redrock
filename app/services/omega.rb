@@ -1,5 +1,5 @@
 class Omega
-  BATCH_SIZE = 100
+  BATCH_SIZE = 1000
 
   def initialize
     @client = TinyTds::Client.new(
@@ -14,7 +14,7 @@ class Omega
     data = []
     ids = []
 
-    1000.times do |i|
+    100.times do |i|
       query_string = "SELECT TOP(#{ids.count + BATCH_SIZE}) * FROM Common.Account"
       if ids.present?
         query_string = "#{query_string} EXCEPT SELECT TOP(#{ids.count}) * FROM Common.Account"
