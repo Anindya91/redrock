@@ -39,3 +39,5 @@
 
 /config/deploy.rb
 /config/deploy/*.rb
+
+.DS_Store
