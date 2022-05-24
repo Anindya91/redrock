@@ -8,6 +8,6 @@ class Omega::Customer < Omega
   private
 
   def set_phone_numbers
-    self.phone_numbers = OmegaClient.new.get_phone_numbers(self.id)
+    self.phone_numbers = OmegaClient.new.get_phone_numbers(self.id) if id.present?
   end
 end
