@@ -1,13 +1,13 @@
 class Omega
   BATCH_SIZE = 100
 
-  def get_accounts
+  def self.get_accounts
     data = []
     ids = []
 
     client = get_client
     10000.times do |i|
-      query_string = "SELECT TOP(#{ids.count+batch_size}) * FROM Common.Account"
+      query_string = "SELECT TOP(#{ids.count + BATCH_SIZE}) * FROM Common.Account"
       if ids.present?
         query_string = "#{query_string} EXCEPT SELECT TOP(#{ids.count}) * FROM Common.Account"
       end
@@ -18,7 +18,7 @@ class Omega
         data << r
         new_ids << r["Id"]
       end
-      break if new_ids.blank?
+      break
       ids += new_ids
     end
     client.close
