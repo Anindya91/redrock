@@ -1,5 +1,5 @@
 class Hubspot
-  @api_key = Rails.application.credentials[:hubspot][:api_key]
+  @api_key = Rails.application.credentials[:hubspot_api_key]
   @api_url = "https://api.hubapi.com"
   @contacts_api_url = "#{@api_url}/contacts/v1/contact"
 
