@@ -14,7 +14,7 @@ class Omega
     data = []
     ids = []
 
-    10000.times do |i|
+    1000.times do |i|
       query_string = "SELECT TOP(#{ids.count + BATCH_SIZE}) * FROM Common.Account"
       if ids.present?
         query_string = "#{query_string} EXCEPT SELECT TOP(#{ids.count}) * FROM Common.Account"
@@ -26,7 +26,7 @@ class Omega
         data << r
         new_ids << r["Id"]
       end
-      break
+      break if new_ids.blank?
       ids += new_ids
     end
 
