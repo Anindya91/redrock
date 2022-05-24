@@ -16,8 +16,9 @@ class Omega
 
     query_string = "SELECT * FROM Common.Account WHERE #{query_string("AdminStatusId", status_ids)}"
     result = @client.execute(query_string)
+    data = result.to_a
 
-    close_connection and return result.to_a
+    close_connection and return data
   end
 
   private
