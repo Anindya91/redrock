@@ -1,5 +1,6 @@
 class OmegaClient
   def initialize
+    @map = {}
     @client = TinyTds::Client.new(
       username: Rails.application.credentials.omega_username,
       password: Rails.application.credentials.omega_password,
@@ -9,13 +10,19 @@ class OmegaClient
   end
 
   def get_active_accounts(keep_alive: false)
-    status_fields = ["Id"]
+    status_fields = ["Id", "Code"]
     status_query = [{ key: "Code", values: ["A", "AV"] }]
     status_result = sql_execute("AdminStatus", fields: status_fields, query: status_query)
-    status_ids = status_result.to_a.map { |s| s["Id"] }
 
-    fields = ["Id", "AccountNumber"]
-    query = [{ key: "AdminStatusId", values: status_ids }]
+    status_map = {}
+    status_result.to_a.map { |s| status_map[s["Id"]] = s["Code"] }
+    @map[:admin_status] = status_map
+
+    cache_provinces(keep_alive: true)
+    cache_countries(keep_alive: true)
+
+    fields = ["Id", "AccountNumber", "AdminStatusId"]
+    query = [{ key: "AdminStatusId", values: status_map.keys }]
     result = sql_execute("Account", fields: fields, query: query)
     data = symbolize_data(result.to_a, class_name: "Omega::Account")
 
@@ -62,21 +69,57 @@ class OmegaClient
   end
 
   def get_province(province_id, keep_alive: false)
-    query = [{ key: "Id", values: [province_id] }]
-    result = sql_execute("Province", query: query, schema: "Global")
-    data = symbolize_data(result.to_a, class_name: "Omega::Province")
+    if @map[:provinces].present?
+      existing_data = @map[:provinces].select { |p| p.id == province_id }
+    end
+
+    if existing_data.present?
+      data = existing_data
+    else
+      query = [{ key: "Id", values: [province_id] }]
+      result = sql_execute("Province", query: query, schema: "Global")
+      data = symbolize_data(result.to_a, class_name: "Omega::Province")
+    end
 
     close_connection unless keep_alive
     return data.first
   end
 
   def get_country(country_id, keep_alive: false)
-    query = [{ key: "Id", values: [country_id] }]
-    result = sql_execute("Country", query: query, schema: "Global")
-    data = symbolize_data(result.to_a, class_name: "Omega::Country")
+    if @map[:countries].present?
+      existing_data = @map[:countries].select { |c| c.id == country_id }
+    end
+
+    if existing_data.present?
+      data = existing_data
+    else
+      query = [{ key: "Id", values: [country_id] }]
+      result = sql_execute("Country", query: query, schema: "Global")
+      data = symbolize_data(result.to_a, class_name: "Omega::Country")
+    end
 
     close_connection unless keep_alive
     return data.first
+  end
+
+  def cache_provinces(keep_alive: false)
+    result = sql_execute("Province", schema: "Global")
+    data = symbolize_data(result.to_a, class_name: "Omega::Province")
+
+    @map[:provinces] = data
+
+    close_connection unless keep_alive
+    return data
+  end
+
+  def cache_countries(keep_alive: false)
+    result = sql_execute("Country", schema: "Global")
+    data = symbolize_data(result.to_a, class_name: "Omega::Country")
+
+    @map[:countries] = data
+
+    close_connection unless keep_alive
+    return data
   end
 
   private
@@ -84,7 +127,7 @@ class OmegaClient
   def symbolize_data(data, class_name: nil)
     new_data = data.map { |d| d.deep_transform_keys { |key| key.underscore }.symbolize_keys }
     if class_name.present?
-      new_data = new_data.map { |d| class_name.constantize.new(d, self) }
+      new_data = new_data.map { |d| class_name.constantize.new(d.merge({ map: @map }), self) }
     end
 
     return new_data
