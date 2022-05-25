@@ -1,5 +1,5 @@
 class Omega::Account < Omega
-  attr_reader :id, :account_number, :account_customer, :open_date, :admin_status, :collateral
+  attr_reader :id, :account_number, :account_customer, :open_date, :admin_status, :collateral, :account_remark_codes
 
   def initialize(params, client)
     @id = params[:id]
@@ -9,6 +9,7 @@ class Omega::Account < Omega
     if @id.present?
       @account_customer = client.get_account_customer(@id, keep_alive: true)
       @collateral = client.get_collateral(@id, keep_alive: true)
+      @account_remark_codes = client.get_account_remark_codes(@id, keep_alive: true)
     end
   end
 

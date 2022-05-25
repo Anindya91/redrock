@@ -104,9 +104,13 @@ class OmegaClient
   end
 
   def get_account_remark_codes(account_id, keep_alive: false)
+    fields = ["Id", "RemarkCodeId"]
     query = [{ key: "AccountId", values: [account_id] }]
-    result = sql_execute("AccountRemarkCode", query: query)
+    result = sql_execute("AccountRemarkCode", fields: fields, query: query)
     data = symbolize_data(result.to_a, class_name: "Omega::AccountRemarkCode")
+
+    close_connection unless keep_alive
+    return data
   end
 
   def get_collateral(account_id, keep_alive: false)
