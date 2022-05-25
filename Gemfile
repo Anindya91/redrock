@@ -17,6 +17,7 @@ gem "sidekiq-cron"
 gem "httparty"
 gem "tiny_tds"
 gem "tailwindcss-rails", "~> 2.0"
+gem "honeybadger", "~> 4.0"
 
 gem "tzinfo-data", platforms: %i[ mingw mswin x64_mingw jruby ]
 

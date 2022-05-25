@@ -40,4 +40,6 @@
 /config/deploy.rb
 /config/deploy/*.rb
 
+/config/honeybadger.yml
+
 .DS_Store
