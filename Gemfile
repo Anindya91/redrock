@@ -14,6 +14,9 @@ gem "jbuilder"
 gem "redis", "~> 4.0"
 gem "sidekiq"
 gem "sidekiq-cron"
+gem "httparty"
+gem "tiny_tds"
+gem "tailwindcss-rails", "~> 2.0"
 
 gem "tzinfo-data", platforms: %i[ mingw mswin x64_mingw jruby ]
 
@@ -30,6 +33,7 @@ group :development do
   gem 'capistrano-rails',   require: false
   gem 'capistrano-bundler', require: false
   gem 'capistrano3-puma',   require: false
+  gem 'capistrano-sidekiq', require: false
 end
 
 group :test do
@@ -37,5 +41,3 @@ group :test do
   gem "selenium-webdriver"
   gem "webdrivers"
 end
-
-gem "tailwindcss-rails", "~> 2.0"
