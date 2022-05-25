@@ -22,7 +22,7 @@ class OmegaClient
     cache_countries(keep_alive: true)
     cache_remark_codes(keep_alive: true)
 
-    fields = ["Id", "AccountNumber", "AdminStatusId", "OpenDate"]
+    fields = ["Id", "AccountNumber", "AdminStatusId", "OpenDate", "InternalStatus"]
     query = [{ key: "AdminStatusId", values: status_map.keys }]
     result = sql_execute("Account", fields: fields, query: query)
     data = symbolize_data(result.to_a, class_name: "Omega::Account")
