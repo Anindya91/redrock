@@ -28,12 +28,34 @@ class HubspotClient
     response
   end
 
-  def self.delete_contact(email)
-    # response = get_contact(email)
-    # if (response && response["vid"])
-    #   res = HTTParty.delete("#{@contacts_api_url}/vid/#{response["vid"]}?hapikey=#{@api_key}")
-    # end
-    # res && res.parsed_response
+  def self.list_contacts
+    response = HTTParty.get("#{@api_url}/crm/v3/objects/contacts?limit=100&hapikey=#{@api_key}")
+    next_link = response.parsed_response["paging"]["next"]["link"] rescue nil
+
+    data = response.parsed_response["results"]
+
+    until next_link.blank?
+      response = HTTParty.get("#{next_link}&hapikey=#{@api_key}")
+      next_link = response.parsed_response["paging"]["next"]["link"] rescue nil
+
+      data += response.parsed_response["results"]
+    end
+
+    return data
+  end
+
+  def self.delete_contact(vid)
+    res = HTTParty.delete("#{@contacts_api_url}/vid/#{vid}?hapikey=#{@api_key}")
+    res && res.parsed_response
+  end
+
+  def self.delete_contact_by_email(email)
+    response = get_contact(email)
+    if (response && response["vid"])
+      res = delete_contact(response["vid"])
+    end
+
+    return res
   end
 
   def self.formatted_data(data, k)

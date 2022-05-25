@@ -32,14 +32,8 @@ class Omega::Account < Omega
       "data1_primary_address_state" => primary_address.province.abbreviation,
       "data1_primary_address_zip_code" => primary_address.zip_code,
       "open_date" => open_date,
+      "internal_status" => ["", "", "", "Active", "Closed", "Charged Off"][internal_status],
     }
-
-    int_status = [nil, nil, nil, "Active"][internal_status]
-    if int_status.present?
-      data.merge!({
-        "internal_status" => int_status
-      })
-    end
 
     if account_installment.present?
       data.merge!({
