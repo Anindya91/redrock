@@ -6,7 +6,7 @@ class ContactSyncer
 
     active_accounts.each do |account|
       email, data = account.hubspot_object
-      HubspotClient.delay(queue: 'low').update_contact(email, data)
+      HubspotContactWorker.perform_async(email, data)
     end
   end
 end
