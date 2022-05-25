@@ -39,7 +39,7 @@ class HubspotClient
   def self.formatted_data(data, k)
     obj = { property: k, value: data[k] }
 
-    date_keys = ["birthdate", "open_date"]
+    date_keys = ["birthdate", "open_date", "next_due"]
     if date_keys.include?(k)
       obj[:value] = obj[:value].to_datetime.utc.at_beginning_of_day.to_i * 1000
     end
