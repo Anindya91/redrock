@@ -21,7 +21,7 @@ class OmegaClient
     cache_provinces(keep_alive: true)
     cache_countries(keep_alive: true)
 
-    fields = ["Id", "AccountNumber", "AdminStatusId"]
+    fields = ["Id", "AccountNumber", "AdminStatusId", "OpenDate"]
     query = [{ key: "AdminStatusId", values: status_map.keys }]
     result = sql_execute("Account", fields: fields, query: query)
     data = symbolize_data(result.to_a, class_name: "Omega::Account")
@@ -113,7 +113,7 @@ class OmegaClient
   end
 
   def get_collateral_vehicle(collateral_id, keep_alive: false)
-    fields = ["Id", "LicenseNumber", "VIN", "Mileage", "Year", "Make", "Model"]
+    fields = ["Id", "VIN", "Mileage", "Year", "Make", "Model"]
     query = [{ key: "CollateralId", values: [collateral_id] }]
     result = sql_execute("CollateralVehicle", fields: fields, query: query)
     data = symbolize_data(result.to_a, class_name: "Omega::CollateralVehicle")

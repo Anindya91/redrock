@@ -1,9 +1,10 @@
 class Omega::Account < Omega
-  attr_reader :id, :account_number, :account_customer, :admin_status, :collateral
+  attr_reader :id, :account_number, :account_customer, :open_date, :admin_status, :collateral
 
   def initialize(params, client)
     @id = params[:id]
     @account_number = params[:account_number]
+    @open_date = params[:open_date]
     @admin_status = params[:map][:admin_status][params[:admin_status_id]]
     if @id.present?
       @account_customer = client.get_account_customer(@id, keep_alive: true)
@@ -26,7 +27,19 @@ class Omega::Account < Omega
       "data1_primary_address_city" => primary_address.city,
       "data1_primary_address_state" => primary_address.province.abbreviation,
       "data1_primary_address_zip_code" => primary_address.zip_code,
+      "open_date" => open_date,
     }
+
+    collateral_vehicle = collateral.collateral_vehicle
+    if collateral_vehicle.present?
+      data.merge!({
+        "collateral_make" => collateral_vehicle.make,
+        "collateral_model" => collateral_vehicle.model,
+        "collateral_year" => collateral_vehicle.year,
+        "collateral_vin" => collateral_vehicle.vin,
+        "collateral_mileage" => collateral_vehicle.mileage,
+      })
+    end
 
     return [email, data]
   end
