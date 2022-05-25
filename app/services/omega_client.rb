@@ -30,7 +30,7 @@ class OmegaClient
     data = symbolize_data(result.to_a, class_name: "Omega::AccountCustomer")
 
     close_connection unless keep_alive
-    return data
+    return data.first
   end
 
   def get_customer(customer_id, keep_alive: false)
@@ -40,7 +40,7 @@ class OmegaClient
     data = symbolize_data(result.to_a, class_name: "Omega::Customer")
 
     close_connection unless keep_alive
-    return data
+    return data.first
   end
 
   def get_phone_numbers(customer_id, keep_alive: false)
@@ -67,7 +67,7 @@ class OmegaClient
     data = symbolize_data(result.to_a, class_name: "Omega::Province")
 
     close_connection unless keep_alive
-    return data
+    return data.first
   end
 
   def get_country(country_id, keep_alive: false)
@@ -76,7 +76,7 @@ class OmegaClient
     data = symbolize_data(result.to_a, class_name: "Omega::Country")
 
     close_connection unless keep_alive
-    return data
+    return data.first
   end
 
   private
