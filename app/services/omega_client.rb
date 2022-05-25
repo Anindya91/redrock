@@ -123,6 +123,15 @@ class OmegaClient
     return data.first
   end
 
+  def get_account_installment(account_id, keep_alive: false)
+    query = [{ key: "AccountId", values: [account_id] }]
+    result = sql_execute("AccountInstallment", query: query)
+    data = symbolize_data(result.to_a, class_name: "Omega::AccountInstallment")
+
+    close_connection unless keep_alive
+    return data.first
+  end
+
   def get_collateral_vehicle(collateral_id, keep_alive: false)
     fields = ["Id", "VIN", "Mileage", "Year", "Make", "Model"]
     query = [{ key: "CollateralId", values: [collateral_id] }]

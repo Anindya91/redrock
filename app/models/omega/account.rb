@@ -1,6 +1,6 @@
 class Omega::Account < Omega
   attr_reader :id, :account_number, :account_customer, :open_date, :admin_status,
-    :collateral, :account_remark_codes, :internal_status
+    :collateral, :account_remark_codes, :internal_status, :account_installment
 
   def initialize(params, client)
     @id = params[:id]
@@ -12,6 +12,7 @@ class Omega::Account < Omega
       @account_customer = client.get_account_customer(@id, keep_alive: true)
       @collateral = client.get_collateral(@id, keep_alive: true)
       @account_remark_codes = client.get_account_remark_codes(@id, keep_alive: true)
+      @account_installment = client.get_account_installment(@id, keep_alive: true)
     end
   end
 
@@ -37,6 +38,14 @@ class Omega::Account < Omega
     if int_status.present?
       data.merge!({
         "internal_status" => int_status
+      })
+    end
+
+    if account_installment.present?
+      data.merge!({
+        "next_due" => account_installment.next_due_date,
+        "whole_payments_made" => account_installment.number_of_whole_payments,
+        "total_balance" => account_installment.total_current_balance.to_f
       })
     end
 
