@@ -20,6 +20,7 @@ class OmegaClient
 
     cache_provinces(keep_alive: true)
     cache_countries(keep_alive: true)
+    cache_remark_codes(keep_alive: true)
 
     fields = ["Id", "AccountNumber", "AdminStatusId", "OpenDate"]
     query = [{ key: "AdminStatusId", values: status_map.keys }]
@@ -102,6 +103,12 @@ class OmegaClient
     return data.first
   end
 
+  def get_account_remark_codes(account_id, keep_alive: false)
+    query = [{ key: "AccountId", values: [account_id] }]
+    result = sql_execute("AccountRemarkCode", query: query)
+    data = symbolize_data(result.to_a, class_name: "Omega::AccountRemarkCode")
+  end
+
   def get_collateral(account_id, keep_alive: false)
     fields = ["Id", "CollateralType"]
     query = [{ key: "AccountId", values: [account_id] }]
@@ -137,6 +144,16 @@ class OmegaClient
     data = symbolize_data(result.to_a, class_name: "Omega::Country")
 
     @map[:countries] = data
+
+    close_connection unless keep_alive
+    return data
+  end
+
+  def cache_remark_codes(keep_alive: false)
+    result = sql_execute("RemarkCode", query: [{ key: "Active", values: [true] }])
+    data = symbolize_data(result.to_a, class_name: "Omega::RemarkCode")
+
+    @map[:remark_codes] = data
 
     close_connection unless keep_alive
     return data
