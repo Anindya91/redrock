@@ -54,9 +54,6 @@ GEM
     activerecord (7.0.3)
       activemodel (= 7.0.3)
       activesupport (= 7.0.3)
-    activerecord-sqlserver-adapter (7.0.0.0)
-      activerecord (~> 7.0.0)
-      tiny_tds
     activestorage (7.0.3)
       actionpack (= 7.0.3)
       activejob (= 7.0.3)
@@ -274,7 +271,6 @@ PLATFORMS
   x86_64-linux
 
 DEPENDENCIES
-  activerecord-sqlserver-adapter
   bootsnap
   capistrano
   capistrano-bundler

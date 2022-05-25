@@ -1,7 +1,6 @@
 Rails.application.routes.draw do
-  root "imports#index"
-  resources :imports
+  # root "/"
 
   # Sidekiq
-  mount Sidekiq::Web, :at => '/sidekiq'
+  mount Sidekiq::Web, :at => '/'
 end
