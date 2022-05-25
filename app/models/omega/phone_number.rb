@@ -1,7 +1,7 @@
 class Omega::PhoneNumber < Omega
   attr_reader :id, :phone_number, :phone_number_type, :call_ok, :primary, :text_ok
 
-  def initialize(params)
+  def initialize(params, client)
     @id = params[:id]
     @phone_number = params[:phone_number]
     @phone_number_type = params[:phone_number_type]
