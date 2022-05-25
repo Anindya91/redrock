@@ -21,11 +21,26 @@ class OmegaClient
     close_connection and return data
   end
 
+  def get_customer(customer_id)
+    fields = ["Id", "FirstName", "MiddleName", "LastName", "EmailAddress", "Birthday"]
+    result = sql_execute("Customer", fields: fields, query_key: "Id", query_values: [customer_id])
+    data = symbolize_data(result.to_a, class_name: "Omega::Customer")
+
+    close_connection and return data
+  end
+
   def get_phone_numbers(customer_id)
     result = sql_execute("PhoneNumber", query_key: "ParentId", query_values: [customer_id])
     data = symbolize_data(result.to_a, class_name: "Omega::PhoneNumber")
 
-    close_connection and return symbolize_data(data)
+    close_connection and return data
+  end
+
+  def get_addresses(customer_id)
+    result = sql_execute("Address", query_key: "ParentId", query_values: [customer_id])
+    data = symbolize_data(result.to_a, class_name: "Omega::Address")
+
+    close_connection and return data
   end
 
   private
@@ -69,4 +84,3 @@ class OmegaClient
     arr.join(" OR ")
   end
 end
-OmegaClient.new.get_phone_numbers("1F788E5C-62C1-45B9-9179-AFEBB5DD4191")
