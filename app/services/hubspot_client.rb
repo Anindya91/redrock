@@ -38,7 +38,9 @@ class HubspotClient
       response = HTTParty.get("#{next_link}&hapikey=#{@api_key}")
       next_link = response.parsed_response["paging"]["next"]["link"] rescue nil
 
-      data += response.parsed_response["results"]
+      if response.parsed_response["results"]
+        data += response.parsed_response["results"]
+      end
     end
 
     return data
