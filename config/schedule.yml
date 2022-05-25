@@ -1,0 +1,3 @@
+contact_syncer_cron:
+  cron: "15 * * * *" # Every hour
+  class: "ContactSyncer"
