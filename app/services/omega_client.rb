@@ -102,6 +102,26 @@ class OmegaClient
     return data.first
   end
 
+  def get_collateral(account_id, keep_alive: false)
+    fields = ["Id", "CollateralType"]
+    query = [{ key: "AccountId", values: [account_id] }]
+    result = sql_execute("Collateral", fields: fields, query: query)
+    data = symbolize_data(result.to_a, class_name: "Omega::Collateral")
+
+    close_connection unless keep_alive
+    return data.first
+  end
+
+  def get_collateral_vehicle(collateral_id, keep_alive: false)
+    fields = ["Id", "LicenseNumber", "VIN", "Mileage", "Year", "Make", "Model"]
+    query = [{ key: "CollateralId", values: [collateral_id] }]
+    result = sql_execute("CollateralVehicle", fields: fields, query: query)
+    data = symbolize_data(result.to_a, class_name: "Omega::CollateralVehicle")
+
+    close_connection unless keep_alive
+    return data.first
+  end
+
   def cache_provinces(keep_alive: false)
     result = sql_execute("Province", schema: "Global")
     data = symbolize_data(result.to_a, class_name: "Omega::Province")
