@@ -52,7 +52,7 @@ class OmegaClient
     return data
   end
 
-  def get_addresses(customer_id)
+  def get_addresses(customer_id, keep_alive: false)
     query = [{ key: "ParentId", values: [customer_id] }, { key: "Active", values: [true] }]
     result = sql_execute("Address", query: query)
     data = symbolize_data(result.to_a, class_name: "Omega::Address")
@@ -61,7 +61,7 @@ class OmegaClient
     return data
   end
 
-  def get_province(province_id)
+  def get_province(province_id, keep_alive: false)
     query = [{ key: "Id", values: [province_id] }]
     result = sql_execute("Province", query: query, schema: "Global")
     data = symbolize_data(result.to_a, class_name: "Omega::Province")
@@ -70,7 +70,7 @@ class OmegaClient
     return data
   end
 
-  def get_country(country_id)
+  def get_country(country_id, keep_alive: false)
     query = [{ key: "Id", values: [country_id] }]
     result = sql_execute("Country", query: query, schema: "Global")
     data = symbolize_data(result.to_a, class_name: "Omega::Country")
