@@ -24,7 +24,6 @@ class Omega::Account < Omega
       "lastname" => account_customer.customer.last_name,
       "account" => account_number,
       "admin_status" => admin_status,
-      "birthdate" => account_customer.customer.birthday,
       "data1_primary_address_line_1" => primary_address.addr_line1,
       "data1_primary_address_line_2" => primary_address.addr_line2,
       "data1_primary_address_line_3" => primary_address.addr_line3,
@@ -34,6 +33,10 @@ class Omega::Account < Omega
       "open_date" => open_date,
       "internal_status" => ["", "", "", "Active", "Closed", "Charged Off"][internal_status],
     }
+
+    if account_customer.customer.birthday.present?
+      data["birthdate"] = account_customer.customer.birthday
+    end
 
     if account_installment.present?
       data.merge!({
