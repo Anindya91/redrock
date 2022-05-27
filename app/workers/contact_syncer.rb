@@ -2,11 +2,13 @@ class ContactSyncer
   include Sidekiq::Worker
 
   def perform
-    accounts = OmegaClient.new.get_accounts
+    response = OmegaClient.new.list_accounts
+    map = response[:map]
+    accounts = response[:accounts]
 
     accounts.each do |account|
-      email, data = account.hubspot_object
-      valid_emails << email
+      account_object = OmegaClient.new(map).get_account(account["Id"])
+      email, data = account_object.hubspot_object
 
       HubspotContactWorker.perform_async(email, data)
     end

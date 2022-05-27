@@ -1,6 +1,6 @@
 class OmegaClient
-  def initialize
-    @map = {}
+  def initialize(map = {})
+    @map = map
     @client = TinyTds::Client.new(
       username: Rails.application.credentials.omega_username,
       password: Rails.application.credentials.omega_password,
@@ -9,11 +9,10 @@ class OmegaClient
     )
   end
 
-  def get_accounts(keep_alive: false)
+  def list_accounts(keep_alive: false)
+    status_map = {}
     status_fields = ["Id", "Code"]
     status_result = sql_execute("AdminStatus", fields: status_fields)
-
-    status_map = {}
     status_result.to_a.map { |s| status_map[s["Id"]] = s["Code"] }
     @map[:admin_status] = status_map
 
@@ -21,14 +20,23 @@ class OmegaClient
     cache_countries(keep_alive: true)
     cache_remark_codes(keep_alive: true)
 
-    fields = ["Id", "AccountNumber", "AdminStatusId", "OpenDate", "InternalStatus"]
-    query = [{ key: "AdminStatusId", values: status_map.keys }]
-    result = sql_execute("Account", fields: fields, query: query)
+    fields = ["Id", "InternalStatus"]
+    result = sql_execute("Account", fields: fields)
     active_and_closed_accounts = result.to_a.select { |d| [3, 4].include?(d["InternalStatus"]) }
-    data = symbolize_data(active_and_closed_accounts, class_name: "Omega::Account")
 
     close_connection unless keep_alive
-    return data
+    return { map: @map, accounts: active_and_closed_accounts}
+  end
+
+  def get_account(account_id, keep_alive: false)
+    fields = ["Id", "AccountNumber", "AdminStatusId", "OpenDate", "InternalStatus"]
+    query = [{ key: "Id", values: [account_id] }]
+    result = sql_execute("Account", fields: fields, query: query, top: 1)
+
+    data = symbolize_data(result.to_a, class_name: "Omega::Account")
+
+    close_connection unless keep_alive
+    return data.first
   end
 
   def get_account_customer(account_id, keep_alive: false)
@@ -187,12 +195,12 @@ class OmegaClient
     @client.close
   end
 
-  def sql_execute(table_name, fields: ["*"], query: [], schema: "Common")
-    @client.execute(sql_select_command(fields, table_name, query, schema))
+  def sql_execute(table_name, fields: ["*"], query: [], schema: "Common", top: nil)
+    @client.execute(sql_select_command(fields, table_name, query, schema, top))
   end
 
-  def sql_select_command(fields, table_name, query, schema)
-    string = "SELECT #{select_fields(fields)} FROM #{schema}.#{table_name}"
+  def sql_select_command(fields, table_name, query, schema, top)
+    string = "SELECT#{top.nil? ? " " : " TOP(#{top}) "}#{select_fields(fields)} FROM #{schema}.#{table_name}"
     if query.present?
       query_string = query.map { |q| query_string(q[:key], q[:values]) }.join(" AND ")
       string = [ string, query_string ].join(" WHERE ")
