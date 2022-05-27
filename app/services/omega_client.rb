@@ -9,10 +9,9 @@ class OmegaClient
     )
   end
 
-  def get_active_accounts(keep_alive: false)
+  def get_accounts(keep_alive: false)
     status_fields = ["Id", "Code"]
-    status_query = [{ key: "Code", values: ["A", "AV"] }]
-    status_result = sql_execute("AdminStatus", fields: status_fields, query: status_query)
+    status_result = sql_execute("AdminStatus", fields: status_fields)
 
     status_map = {}
     status_result.to_a.map { |s| status_map[s["Id"]] = s["Code"] }
@@ -25,7 +24,8 @@ class OmegaClient
     fields = ["Id", "AccountNumber", "AdminStatusId", "OpenDate", "InternalStatus"]
     query = [{ key: "AdminStatusId", values: status_map.keys }]
     result = sql_execute("Account", fields: fields, query: query)
-    data = symbolize_data(result.to_a, class_name: "Omega::Account")
+    active_and_closed_accounts = result.to_a.select { |d| [3, 4].include?(d["InternalStatus"]) }
+    data = symbolize_data(active_and_closed_accounts, class_name: "Omega::Account")
 
     close_connection unless keep_alive
     return data
