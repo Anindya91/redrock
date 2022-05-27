@@ -10,15 +10,7 @@ class OmegaClient
   end
 
   def list_accounts(keep_alive: false)
-    status_map = {}
-    status_fields = ["Id", "Code"]
-    status_result = sql_execute("AdminStatus", fields: status_fields)
-    status_result.to_a.map { |s| status_map[s["Id"]] = s["Code"] }
-    @map[:admin_status] = status_map
-
-    cache_provinces(keep_alive: true)
-    cache_countries(keep_alive: true)
-    cache_remark_codes(keep_alive: true)
+    set_cache_map if @map.blank?
 
     fields = ["Id", "InternalStatus"]
     result = sql_execute("Account", fields: fields)
@@ -29,6 +21,8 @@ class OmegaClient
   end
 
   def get_account(account_id, keep_alive: false)
+    set_cache_map if @map.blank?
+
     fields = ["Id", "AccountNumber", "AdminStatusId", "OpenDate", "InternalStatus"]
     query = [{ key: "Id", values: [account_id] }]
     result = sql_execute("Account", fields: fields, query: query, top: 1)
@@ -150,6 +144,17 @@ class OmegaClient
     return data.first
   end
 
+  def cache_admin_statuses(keep_alive: false)
+    status_map = {}
+    status_fields = ["Id", "Code"]
+    status_result = sql_execute("AdminStatus", fields: status_fields)
+    status_result.to_a.map { |s| status_map[s["Id"]] = s["Code"] }
+    @map[:admin_status] = status_map
+
+    close_connection unless keep_alive
+    return status_map
+  end
+
   def cache_provinces(keep_alive: false)
     result = sql_execute("Province", schema: "Global")
     data = symbolize_data(result.to_a, class_name: "Omega::Province")
@@ -181,6 +186,13 @@ class OmegaClient
   end
 
   private
+
+  def set_cache_map
+    cache_admin_statuses(keep_alive: true)
+    cache_provinces(keep_alive: true)
+    cache_countries(keep_alive: true)
+    cache_remark_codes(keep_alive: true)
+  end
 
   def symbolize_data(data, class_name: nil)
     new_data = data.map { |d| d.deep_transform_keys { |key| key.underscore }.symbolize_keys }

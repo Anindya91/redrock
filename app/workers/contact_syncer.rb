@@ -1,5 +1,6 @@
 class ContactSyncer
   include Sidekiq::Worker
+  sidekiq_options retry: false
 
   def perform
     response = OmegaClient.new.list_accounts
@@ -7,10 +8,16 @@ class ContactSyncer
     accounts = response[:accounts]
 
     accounts.each do |account|
-      account_object = OmegaClient.new(map).get_account(account["Id"])
-      email, data = account_object.hubspot_object
+      account_id = account["Id"]
 
-      HubspotContactWorker.perform_async(email, data)
+      begin
+        account_object = OmegaClient.new(map).get_account(account_id)
+        email, data = account_object.hubspot_object
+
+        HubspotClient.update_contact(email, data)
+      rescue Net::ReadTimeout => e
+        HubspotContactWorker.perform_async(account_id, email, data)
+      end
     end
   end
 end
