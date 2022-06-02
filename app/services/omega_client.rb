@@ -12,12 +12,13 @@ class OmegaClient
   def list_accounts(keep_alive: false)
     set_cache_map if @map.blank?
 
-    fields = ["Id", "InternalStatus"]
-    result = sql_execute("Account", fields: fields)
-    active_and_closed_accounts = result.to_a.select { |d| [3, 4].include?(d["InternalStatus"]) }
+    fields = ["Id", "InternalStatus", "AdminStatusId", "OpenDate", "InternalStatus"]
+    query = [ { key: "InternalStatus", values: [3, 4] }]
+    result = sql_execute("Account", fields: fields, query: query)
+    data = symbolize_data(result.to_a, class_name: "Omega::Account")
 
     close_connection unless keep_alive
-    return { map: @map, accounts: active_and_closed_accounts}
+    return data
   end
 
   def get_account(account_id, keep_alive: false)
