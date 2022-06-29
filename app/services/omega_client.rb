@@ -145,6 +145,15 @@ class OmegaClient
     return data.first
   end
 
+  def get_customer_employers(customer_id, keep_alive: false)
+    query = [{ key: "CustomerId", values: [customer_id] }]
+    result = sql_execute("CustomerEmployer", query: query)
+    data = symbolize_data(result.to_a, class_name: "Omega::CustomerEmployer")
+
+    close_connection unless keep_alive
+    return data
+  end
+
   def cache_admin_statuses(keep_alive: false)
     status_map = {}
     status_fields = ["Id", "Code"]

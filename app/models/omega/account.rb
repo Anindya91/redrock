@@ -73,7 +73,7 @@ class Omega::Account < Omega
         first_name: customer.first_name,
         middle_name: customer.middle_name,
         last_name: customer.last_name,
-        date_of_birth: customer.strftime("%Y-%m-%d"),
+        date_of_birth: customer.birthday.strftime("%Y-%m-%d"),
         gender: [nil, "Male", "Female"][customer.sex],
         marital_status: [nil, "Single", "Married", "Domestic Partnership",
           "Other", "unknown", "Separated"][customer.marital_status] || "unknown",
