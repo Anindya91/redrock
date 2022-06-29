@@ -16,12 +16,16 @@ class Omega::Account < Omega
     end
   end
 
+  def customer
+    account_customer.customer
+  end
+
   def hubspot_object
-    email = account_customer.customer.email_address
-    primary_address = account_customer.customer.addresses.find { |p| p.primary }
+    email = customer.email_address
+    primary_address = customer.addresses.find { |p| p.primary }
     data = {
-      "firstname" => account_customer.customer.first_name,
-      "lastname" => account_customer.customer.last_name,
+      "firstname" => customer.first_name,
+      "lastname" => customer.last_name,
       "account" => account_number,
       "admin_status" => admin_status,
       "data1_primary_address_line_1" => primary_address.addr_line1,
@@ -35,7 +39,7 @@ class Omega::Account < Omega
     }
 
     if account_customer.customer.birthday.present?
-      data["birthdate"] = account_customer.customer.birthday
+      data["birthdate"] = customer.birthday
     end
 
     if account_installment.present?
@@ -58,5 +62,52 @@ class Omega::Account < Omega
     end
 
     return [email, data]
+  end
+
+  def neo_verify_object
+    data = {
+      app_id: id,
+      type: "Normal",
+      car_lot: "ER",
+      applicant: {
+        first_name: customer.first_name,
+        middle_name: customer.middle_name,
+        last_name: customer.last_name,
+        date_of_birth: customer.strftime("%Y-%m-%d"),
+        gender: [nil, "Male", "Female"][customer.sex],
+        marital_status: [nil, "Single", "Married", "Domestic Partnership",
+          "Other", "unknown", "Separated"][customer.marital_status] || "unknown",
+        dependents_number: customer.number_of_dependents,
+        time_in_area: "",
+        residence_changes_3_years: "",
+        previous_customer: "",
+        insurance: "None",
+        beacon_score: 482,
+        repossessions: 1,
+        chapter_13: 0,
+        landline_phone: "false",
+      }
+    }
+
+    residences = []
+    customer.address.each do |address|
+      residence_object = {
+        street: address.addr_line1,
+        city: address.city,
+        state: address.state,
+        zip: address.zip_code,
+        residence_type: ["Physical", "Mailing"][address.address_type],
+        current: "#{address.primary == true}"
+      }
+
+      if address.primary
+        residence_object[:start_date] = customer.primary_address_as_of_date.strftime("%Y-%m-%d")
+        residence_object[:end_date] = ""
+      end
+
+      residences << residence_object
+    end
+
+    data[:residences] = residences
   end
 end

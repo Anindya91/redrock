@@ -9,12 +9,12 @@ class OmegaClient
     )
   end
 
-  def list_accounts(keep_alive: false)
+  def list_accounts(keep_alive: false, internal_status: [3, 4], top: nil)
     set_cache_map if @map.blank?
 
     fields = ["Id", "InternalStatus", "AdminStatusId", "OpenDate", "InternalStatus"]
-    query = [ { key: "InternalStatus", values: [3, 4] }]
-    result = sql_execute("Account", fields: fields, query: query)
+    query = [ { key: "InternalStatus", values: internal_status }]
+    result = sql_execute("Account", fields: fields, query: query, top: top)
     data = symbolize_data(result.to_a, class_name: "Omega::Account")
 
     close_connection unless keep_alive
@@ -45,7 +45,7 @@ class OmegaClient
   end
 
   def get_customer(customer_id, keep_alive: false)
-    fields = ["Id", "FirstName", "MiddleName", "LastName", "EmailAddress", "Birthday"]
+    fields = ["Id", "FirstName", "MiddleName", "LastName", "EmailAddress", "Birthday", "Sex", "MaritalStatus", "NumberOfDependents", "PrimaryAddressAsOfDate"]
     query = [{ key: "Id", values: [customer_id] }]
     result = sql_execute("Customer", fields: fields, query: query)
     data = symbolize_data(result.to_a, class_name: "Omega::Customer")
