@@ -90,7 +90,7 @@ class Omega::Account < Omega
     }
 
     residences = []
-    customer.address.each do |address|
+    customer.addresses.each do |address|
       residence_object = {
         street: address.addr_line1,
         city: address.city,
