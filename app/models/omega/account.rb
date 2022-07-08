@@ -44,7 +44,7 @@ class Omega::Account < Omega
 
     if customer.phone_numbers.present?
       primary_phone_number = customer.phone_numbers.find { |phn| phn.primary }
-      data["phone_number"] = primary_phone_number.phone_number if primary_phone_number.present?
+      data["phone"] = primary_phone_number.phone_number if primary_phone_number.present?
     end
 
     if account_installment.present?
