@@ -38,8 +38,13 @@ class Omega::Account < Omega
       "internal_status" => ["", "", "", "Active", "Closed", "Charged Off"][internal_status],
     }
 
-    if account_customer.customer.birthday.present?
+    if customer.birthday.present?
       data["birthdate"] = customer.birthday
+    end
+
+    if customer.phone_numbers.present?
+      primary_phone_number = customer.phone_numbers.find { |phn| phn.primary }
+      data["phone_number"] = primary_phone_number.phone_number if primary_phone_number.present?
     end
 
     if account_installment.present?
