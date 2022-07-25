@@ -72,8 +72,6 @@ class Omega::Account < Omega
   def neo_verify_object
     data = {
       app_id: id,
-      type: "Normal",
-      car_lot: "ER",
       applicant: {
         first_name: customer.first_name,
         middle_name: customer.middle_name,
