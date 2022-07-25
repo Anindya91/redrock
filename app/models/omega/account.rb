@@ -120,7 +120,7 @@ class Omega::Account < Omega
       deal[:interest_rate] = account_installment.current_rate * 100
       deal[:monthly_payment] = account_installment.regular_payment_amount
       deal[:cash_in_deal] = account_installment.cash_price
-      deal[:acv] = account_installment.contractual_amount_financed
+      deal[:acv] = account_installment.contractual_amount_financed / account_installment.contractual_actual_term.to_f
     end
     data[:deal] = deal if deal.present?
 
