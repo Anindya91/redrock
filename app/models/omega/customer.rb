@@ -13,6 +13,7 @@ class Omega::Customer < Omega
     @sex = params[:sex]
     @marital_status = params[:marital_status]
     @number_of_dependents = params[:number_of_dependents]
+    @primary_address_as_of_date = params[:primary_address_as_of_date]
     if @id.present?
       @phone_numbers = client.get_phone_numbers(@id, keep_alive: true)
       @addresses = client.get_addresses(@id, keep_alive: true)

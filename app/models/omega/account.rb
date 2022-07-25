@@ -99,7 +99,7 @@ class Omega::Account < Omega
       residence_object = {
         street: address.addr_line1,
         city: address.city,
-        state: address.state,
+        state: address.province.name,
         zip: address.zip_code,
         residence_type: ["Physical", "Mailing"][address.address_type],
         current: "#{address.primary == true}"
@@ -114,5 +114,7 @@ class Omega::Account < Omega
     end
 
     data[:residences] = residences
+
+    return data
   end
 end

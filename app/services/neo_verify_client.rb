@@ -6,19 +6,20 @@ class NeoVerifyClient
     @data = account.neo_verify_object
   end
 
-  def create_or_update_applcation(account)
-    response = post_request("update_application", @data)
+  def create_or_update_applcation
+    response = send_request("update_application", @data, "put")
     return response.parsed_response if response.code == 202
 
-    response = post_request("create_application", data)
+    response = send_request("create_application", @data, "post")
     response.parsed_response
   end
 
   private
 
-  def post_request(method_name, body)
-    HTTParty.post(
-      File.join(API_URL, method_name),
+  def send_request(path, body, method_name)
+    HTTParty.send(
+      method_name,
+      File.join(API_URL, path),
       body: body.to_json,
       headers: {
         "Accept" => "application/json",
