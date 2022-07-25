@@ -23,7 +23,7 @@ class NeoVerifyClient
       headers: {
         "Accept" => "application/json",
         "Content-Type" => "application/json",
-        "Access-Token" => "TOKEN"
+        "Access-Token" => Rails.application.credentials[:neo_api_key]
       }
     )
   end
