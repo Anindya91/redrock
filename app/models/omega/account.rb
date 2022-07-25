@@ -83,37 +83,64 @@ class Omega::Account < Omega
         marital_status: [nil, "Single", "Married", "Domestic Partnership",
           "Other", "unknown", "Separated"][customer.marital_status] || "unknown",
         dependents_number: customer.number_of_dependents,
-        time_in_area: "",
-        residence_changes_3_years: "",
-        previous_customer: "",
-        insurance: "None",
-        beacon_score: 482,
-        repossessions: 1,
-        chapter_13: 0,
-        landline_phone: "false",
       }
     }
 
     residences = []
     customer.addresses.each do |address|
-      residence_object = {
-        street: address.addr_line1,
-        city: address.city,
-        state: address.province.name,
-        zip: address.zip_code,
-        residence_type: ["Physical", "Mailing"][address.address_type],
-        current: "#{address.primary == true}"
-      }
-
       if address.primary
+        residence_object = {
+          street: address.addr_line1,
+          city: address.city,
+          state: address.province.name,
+          zip: address.zip_code,
+          residence_type: ["Physical", "Mailing"][address.address_type],
+          current: "#{address.primary == true}"
+        }
+
         residence_object[:start_date] = customer.primary_address_as_of_date.strftime("%Y-%m-%d")
         residence_object[:end_date] = ""
-      end
 
-      residences << residence_object
+        residences << residence_object
+      end
     end
 
     data[:residences] = residences
+
+    deal = {}
+    collateral_vehicle = collateral.collateral_vehicle
+    if collateral_vehicle.present?
+      deal[:car] = {
+        make: collateral_vehicle.make,
+        model: collateral_vehicle.model,
+        year: collateral_vehicle.year,
+        mileage: collateral_vehicle.mileage,
+      }
+    end
+    if account_installment.present?
+      deal[:downpayment] = account_installment.down_payment_amount
+      deal[:interest_rate] = account_installment.current_rate * 100
+      deal[:monthly_payment] = account_installment.regular_payment_amount
+      deal[:cash_in_deal] = account_installment.cash_price
+      deal[:acv] = account_installment.contractual_amount_financed
+    end
+    data[:deal] = deal if deal.present?
+
+    employments = []
+    if customer.customer_employers.present?
+      customer.customer_employers.each_with_index do |employer, index|
+        data_object = {
+          employer: employer[:employer_name],
+          end_date: employer[:end_date].present? ? employer[:end_date].strftime("%Y-%m-%d") : employer[:end_date].to_s,
+          start_date: employer[:start_date].strftime("%Y-%m-%d"),
+          monthly_net_income: employer[:salary],
+          pay_period: [nil, nil, nil, nil, nil, "WK"][employer[:salary_frequency]],
+          current: (index == 0).to_s
+        }
+        employments << data_object
+      end
+    end
+    data[:employments] = employments
 
     return data
   end
