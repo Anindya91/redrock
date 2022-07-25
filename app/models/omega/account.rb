@@ -130,11 +130,11 @@ class Omega::Account < Omega
     if customer.customer_employers.present?
       customer.customer_employers.each_with_index do |employer, index|
         data_object = {
-          employer: employer[:employer_name],
-          end_date: employer[:end_date].present? ? employer[:end_date].strftime("%Y-%m-%d") : employer[:end_date].to_s,
-          start_date: employer[:start_date].strftime("%Y-%m-%d"),
-          monthly_net_income: employer[:salary],
-          pay_period: [nil, nil, nil, nil, nil, "WK"][employer[:salary_frequency]],
+          employer: employer.employer_name,
+          end_date: employer.end_date.present? ? employer.end_date.strftime("%Y-%m-%d") : "",
+          start_date: employer.start_date.strftime("%Y-%m-%d"),
+          monthly_net_income: employer.salary,
+          pay_period: [nil, nil, nil, nil, nil, "WK"][employer.salary_frequency],
           current: (index == 0).to_s
         }
         employments << data_object
